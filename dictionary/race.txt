@@ -1,5 +1,0 @@
-black:black skin
-african:black skin
-asian:yellow skin
-white:white skin
-hispanic:brown skin

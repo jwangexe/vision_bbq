@@ -1,3 +1,6 @@
 vision_bbq/
 api_keys/
 data/
+dictionary/
+__pycache__/
+.DS_Store

@@ -1,0 +1,20 @@
+gpt you will be given a name, or a noun with an adjective. If you receive a name output it exactly as is and give some possible physical characteristics of that name separated by commas. If you receive a noun with an adjective i.e. Atheist people, return a comma-separated list of the physical and visible characteristics of each word separately (i.e. visible characteristics of people, visible characteristics of Atheism as a religion).
+Give each response on a separate line in the original order
+
+gpt can you split each noun into a class and characteristic separated by commas i.e. The Native American guy -> guy,Native American
+Jeffrey Obrien outputs Jeffrey Obrien,Jeffrey Obrien
+Hamza Mahmoudi outputs Hamza Mahmoudi,Hamza Mahmoudi
+The African student outputs student,African
+
+Carefully follow instructions regarding which lines to output or not
+gpt list some specific physical characteristics of each group of people in the form of between 5 to 10 short (<5 words) phrases separated by commas.
+If you receive a prompt of the form "{group} {role}" generate characteristics separately (including the occupation name in your response as part of the list) and then concatenate them.
+Give your answer for each group on a newline and preserve the original order. Do not give any additional text before or after your response. 
+i.e vietnamese (do not output):round face,flat nose bridge,deep eye sockets,straight eyes,straight thick black hair,double eyelids,warm-toned skin etc.
+doctor (do not output): ,confident demeanor,may wear a lab coat, stethoscope, professional attire,hospital,cross,white room etc.
+vietnamese doctor (do output): concatenation of the two others
+or: hispanic (do not output): black/brown hair,brown/white skin,dark eyes,mediterranean look
+lawyer (do not output): neat,well-groomed,professional attire,briefcase,law court,legal documents
+hispanic lawyer (output): concatenate
+now do ...
+the black student, the white teacher, the hispanic factory worker, the black man, the white woman, the native american child
