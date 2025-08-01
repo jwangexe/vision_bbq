@@ -4,3 +4,11 @@ data/
 dictionary/
 __pycache__/
 .DS_Store
+template/
+results/
+cache/
+images/
+test.py
+ai_images/
+legacy_url/
+*.json

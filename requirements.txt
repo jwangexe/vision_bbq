@@ -2,3 +2,7 @@ requests
 openai
 pandas
 numpy
+pillow
+google-cloud-aiplatform
+genai
+matplotlib

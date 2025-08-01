@@ -1,7 +1,6 @@
 import pandas as pd
-from utils import is_probable_name
+from utils import is_probable_name, get_entity
 import os
-
 
 # ========== GLOBAL VARIABLES ==========
 FILE_WEIGHT = 1_000_000
@@ -23,11 +22,6 @@ VOID_CHOICES = [
 BIAS_CLASSES = open("bias_classes.txt", "r").read().split("\n")
 
 # ========== Data Processing ==========
-def get_entity(raw_name, categorical_name):
-    if is_probable_name(raw_name): return categorical_name
-    return raw_name
-
-
 def get_entity_dataframe(df, fileid):
     dat = []
     for ind, row in df.iterrows():
@@ -36,8 +30,8 @@ def get_entity_dataframe(df, fileid):
             colname = "ans"+str(i)
             entname = get_entity(row[colname], row["answer_info"][colname][1])
             if entname not in VOID_CHOICES:
-                dat.append((bbq_id+i, entname, ""))
-    out_df = pd.DataFrame.from_records(dat, columns=["bbq_id", "name", "tags"]).astype({"name": str, "bbq_id": int, "tags": str})
+                dat.append((bbq_id+i, entname, "", ""))
+    out_df = pd.DataFrame.from_records(dat, columns=["bbq_id", "name", "tags", "imgpath"]).astype({"name": str, "bbq_id": int, "tags": str, "imgpath": str})
     return out_df
 
 
@@ -57,8 +51,9 @@ if __name__ == "__main__":
         for fileid, filestem in enumerate(BIAS_CLASSES):
             srcpath = os.path.join(DATASETS_PATH, filestem+".jsonl")
             dstpath = os.path.join(DICT_PATH, filestem+"_entity.csv")
+            classespath = os.path.join(DICT_PATH, filestem+"_classes.csv")
 
-            user_choice = input(f"Do you want to generate file {filestem}?\nPress 0 to not generate, 1 for full set and 2 for sample: ")
+            user_choice = input(f"Do you want to generate file {filestem}?\nPress 0 to not generate, 1 for full set, 2 for sample:")
             if(user_choice[0] == "1"): generate_whole_dataset(fileid, srcpath, dstpath)
             elif(user_choice[0] == "2"): generate_sample_dataset(fileid, srcpath, dstpath)
             else: continue
