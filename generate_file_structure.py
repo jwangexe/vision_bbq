@@ -1,5 +1,5 @@
 import pandas as pd
-from utils import is_probable_name, get_entity
+from utils import get_entity
 import os
 
 # ========== GLOBAL VARIABLES ==========

@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import vertexai
 from vertexai.preview.vision_models import ImageGenerationModel
+import time
 
 # ========== GLOBAL VARIABLES ==========
 GOOGLE_API_KEY = open('./api_keys/google/api_key.txt').read()
@@ -15,9 +16,6 @@ MODEL = "imagen-4.0-generate-preview-06-06"
 LOCATION = "us-central1"
 
 # ========== Google Image Generation API ==========
-
-import time
-
 def generate_image_and_save(prompt: str, output_path: str, max_retries: int = 3):
     for attempt in range(max_retries):
         try:
@@ -61,7 +59,9 @@ if __name__ == "__main__":
     if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
         for filestem in BIAS_CLASSES:
             filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
-            if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
+            # if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
+            #     continue
+            if "x" in filestem:
                 continue
             print(f"Reading from {filestem}...")
     

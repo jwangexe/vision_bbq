@@ -5,6 +5,7 @@ from typing import List
 from pathlib import Path
 import time
 from utils import encode_image_to_base64
+from gpt_tools import compress_base64_image_to_token_limit
 
 # ========== GLOBAL VARIABLES ==========
 # API KEYS
@@ -15,6 +16,7 @@ OPENAI_MODEL = "gpt-4.1-2025-04-14"
 GPT_TEMPERATURE = 0
 OPENAI_PROMPT = """Rate each image 0–10 for matching the respective search prompts and for clarity.
 Score <3 if inaccurate, unclear, or not a real photo; ≥7 if clear, accurate, and shows people as described, 10 if almost perfectly describes most of the prompt features.
+Take into account that the images have been compressed so accept some graininess.
 Most distinctive features should appear, but not all. Penalize missing key features.
 Also penalize single person for prompt with plural implications e.g. group, or vice versa.
 Return only the scores, space-separated."""
@@ -23,6 +25,7 @@ MAX_RETRIES = 5
 BATCH_SIZE = 5
 THRESHOLD = 10
 BIAS_CLASSES = open("bias_classes.txt", "r").read().split("\n")
+IMAGE_TOKEN_LIMIT = 10000
 
 
 # ====== GPT-Vision Scoring Function ======
@@ -31,7 +34,7 @@ def ask_gpt_vision_from_files(image_paths: List[str], tags: str) -> List[int]:
     for path in image_paths:
         user_content.append({
             "type": "image_url",
-            "image_url": {"url": encode_image_to_base64(path)}
+            "image_url": {"url": compress_base64_image_to_token_limit(encode_image_to_base64(path), IMAGE_TOKEN_LIMIT)}
         })
 
     try:

@@ -23,7 +23,7 @@ def encode_image_to_base64(image_path: str) -> str:
         data = f.read()
     encoded = base64.b64encode(data).decode("utf-8")
     ext = Path(image_path).suffix[1:].lower()
-    return f"data:image/{ext};base64,{encoded}"
+    return f"data:image/jpeg;base64,{encoded}"
 
 
 def decode_base64_to_image(base64_image_str: str) -> Image.Image:

@@ -85,7 +85,9 @@ if __name__ == "__main__":
         for filestem in BIAS_CLASSES:
             filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
             dst_filepath = os.path.join(DICT_PATH, filestem+"_images.csv")
-            if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
+            # if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
+            #     continue
+            if "x" in filestem:
                 continue
             print(f"Reading from {filestem}...")
     

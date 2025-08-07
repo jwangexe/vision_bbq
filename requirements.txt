@@ -6,3 +6,4 @@ pillow
 google-cloud-aiplatform
 genai
 matplotlib
+pydantic

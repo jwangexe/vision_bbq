@@ -2,7 +2,6 @@ import openai
 import pandas as pd
 import glob
 import os
-from utils import safe_parse_gpt_list
 
 # ========== GLOBAL VARIABLES ==========
 # OPENAI PROMPTS & PARAMETERS
