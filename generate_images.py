@@ -56,13 +56,16 @@ def get_image_per_entity(df: pd.DataFrame, savepath: str) -> pd.DataFrame:
 
 # ========== Main Execution ==========
 if __name__ == "__main__":
-    if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
-        for filestem in BIAS_CLASSES:
+    filestem = "Sexual_orientation"
+    # if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
+    #     for filestem in BIAS_CLASSES:
+    if True:
+        if True:
             filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
             # if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
             #     continue
-            if "x" in filestem:
-                continue
+            # if "x" in filestem:
+            #     continue
             print(f"Reading from {filestem}...")
     
             df = pd.read_csv(filepath)

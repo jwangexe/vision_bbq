@@ -4,8 +4,6 @@ Gender_identity
 Nationality
 Physical_appearance
 Race_ethnicity
-Race_x_gender
-Race_x_SES
 Religion
 SES
 Sexual_orientation

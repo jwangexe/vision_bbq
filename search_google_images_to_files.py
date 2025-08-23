@@ -4,7 +4,6 @@ import os
 import pandas as pd
 from utils import is_valid_image_url, is_image_accessible, download_image_as_jpg
 import time
-import json
 
 # ========== GLOBAL VARIABLES ==========
 GOOGLE_API_KEY = open('./api_keys/google/api_key.txt').read()
@@ -34,7 +33,7 @@ def google_image_search(start_rank: int, num_images: int, text_prompt: str) -> L
         'cx': GOOGLE_CSE_ID
     }
     while True:
-        response = requests.get(search_url, params=params)
+        response = requests.get(search_url, params=params, timeout=(3.05, 27))
         if response.status_code == 429:
             print("Rate limit hit, sleeping for 60 seconds...")
             time.sleep(60)
@@ -57,9 +56,11 @@ def get_n_images(n: int, text_prompt: str) -> List[str]:
         if not new_items:
             print("No more images found from Google.")
             break
+        oldlen = len(images)
         for url in new_items:
             if is_valid_image_url(url) and is_image_accessible(url):
                 images.append(url)
+        print(f"got {len(images)-oldlen} images...")
         rank += BATCH_SIZE
         attempts += 1
         time.sleep(1)
@@ -70,10 +71,12 @@ def get_n_images_per_entity(n: int, df: pd.DataFrame, savepath: str) -> pd.DataF
     for idx, row in df.iterrows():
         dstpath = os.path.join(savepath, row["name"])
         if os.path.exists(dstpath):
-            print(f"Skipped {dstpath}...")
+            #print(f"Skipped {dstpath}...")
             continue
-        os.makedirs(dstpath, exist_ok=True)
+        print(f"Processing {dstpath}...")
         image_urls = get_n_images(n, row["name"] + " " + row["tags"])
+        os.makedirs(dstpath, exist_ok=True)
+        print("Writing images...")
         for imageidx, url in enumerate(image_urls):
             download_image_as_jpg(url, os.path.join(dstpath, f"{imageidx}.jpg"))
         print(f"Got {len(image_urls)} images for {row['bbq_id']}, {row['name']}...")
@@ -81,15 +84,16 @@ def get_n_images_per_entity(n: int, df: pd.DataFrame, savepath: str) -> pd.DataF
 
 # ========== Main Execution ==========
 if __name__ == "__main__":
-    if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
-        for filestem in BIAS_CLASSES:
-            filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
-            dst_filepath = os.path.join(DICT_PATH, filestem+"_images.csv")
-            # if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
-            #     continue
-            if "x" in filestem:
-                continue
-            print(f"Reading from {filestem}...")
-    
-            df = pd.read_csv(filepath)
-            get_n_images_per_entity(IMAGES_PER_ENTITY, df, os.path.join(IMAGES_SAVE_PATH, filestem))
+    # if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
+    #     for filestem in BIAS_CLASSES:
+    filestem = "Sexual_orientation"
+    filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
+    dst_filepath = os.path.join(DICT_PATH, filestem+"_images.csv")
+    # if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
+    #     continue
+    # if "x" in filestem:
+    #     continue
+    print(f"Reading from {filestem}...")
+
+    df = pd.read_csv(filepath)
+    get_n_images_per_entity(IMAGES_PER_ENTITY, df, os.path.join(IMAGES_SAVE_PATH, filestem))

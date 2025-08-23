@@ -25,6 +25,10 @@ def encode_image_to_base64(image_path: str) -> str:
     ext = Path(image_path).suffix[1:].lower()
     return f"data:image/jpeg;base64,{encoded}"
 
+def encode_image_from_url(url):
+    response = requests.get(url)
+    return "data:image/jpeg;base64," + base64.b64encode(response.content).decode("utf-8")
+
 
 def decode_base64_to_image(base64_image_str: str) -> Image.Image:
     if base64_image_str.startswith("data:image"):

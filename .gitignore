@@ -12,3 +12,9 @@ test.py
 ai_images/
 legacy_url/
 *.json
+diagrams/
+madlib/
+delete.py
+*.csv
+*.pkl
+*.sh

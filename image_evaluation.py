@@ -1,11 +1,22 @@
 from openai import OpenAI
 import os
 import pandas as pd
-from typing import List
+from typing import List, Annotated
 from pathlib import Path
 import time
 from utils import encode_image_to_base64
-from gpt_tools import compress_base64_image_to_token_limit
+from toolbox import resize_base64_jpg
+from pydantic import BaseModel, Field
+from openai import OpenAI
+
+class ScoreResponse(BaseModel):
+    score0: Annotated[int, Field(ge=0, le=10)]
+    score1: Annotated[int, Field(ge=0, le=10)]
+    score2: Annotated[int, Field(ge=0, le=10)]
+    score3: Annotated[int, Field(ge=0, le=10)]
+    score4: Annotated[int, Field(ge=0, le=10)]
+
+
 
 # ========== GLOBAL VARIABLES ==========
 # API KEYS
@@ -14,45 +25,47 @@ client = OpenAI(api_key=open('./api_keys/openai/api_key.txt').read())
 # OPENAI PROMPTS & PARAMETERS
 OPENAI_MODEL = "gpt-4.1-2025-04-14"
 GPT_TEMPERATURE = 0
-OPENAI_PROMPT = """Rate each image 0–10 for matching the respective search prompts and for clarity.
-Score <3 if inaccurate, unclear, or not a real photo; ≥7 if clear, accurate, and shows people as described, 10 if almost perfectly describes most of the prompt features.
-Take into account that the images have been compressed so accept some graininess.
-Most distinctive features should appear, but not all. Penalize missing key features.
-Also penalize single person for prompt with plural implications e.g. group, or vice versa.
-Return only the scores, space-separated."""
+OPENAI_PROMPT = """Rate each image from 0–10 for how well it matches its search prompt and for clarity.
+Score <3 if inaccurate, unclear, or not a real photo.
+Score ≥7 if clear, accurate, and depicts people as described.
+Score 10 if it nearly perfectly matches most prompt features.
+Allow some graininess due to compression.
+Key distinctive features must appear; missing them lowers the score.
+Penalize mismatch in number of people (e.g., single vs. group).
+Return only the scores in the original order."""
 DICT_PATH = "./dictionary/"
 MAX_RETRIES = 5
 BATCH_SIZE = 5
 THRESHOLD = 10
 BIAS_CLASSES = open("bias_classes.txt", "r").read().split("\n")
-IMAGE_TOKEN_LIMIT = 10000
 
 
 # ====== GPT-Vision Scoring Function ======
 def ask_gpt_vision_from_files(image_paths: List[str], tags: str) -> List[int]:
-    user_content = [{"type": "text", "text": "Original Prompts:\n" + "\n".join(tags)}]
+    user_content = [{"type": "text", "text": "Original Prompt:\n" + "\n".join(tags)}]
     for path in image_paths:
         user_content.append({
             "type": "image_url",
-            "image_url": {"url": compress_base64_image_to_token_limit(encode_image_to_base64(path), IMAGE_TOKEN_LIMIT)}
+            "image_url": {"url": resize_base64_jpg(encode_image_to_base64(path)), "quality": "low"}
         })
 
     try:
-        response = client.chat.completions.create(
+        response = client.chat.completions.parse(
             model=OPENAI_MODEL,
             messages=[
                 {"role": "system", "content": OPENAI_PROMPT.strip()},
                 {"role": "user", "content": user_content}
             ],
-            max_tokens=50,
+            response_format = ScoreResponse,
             temperature=GPT_TEMPERATURE,
             timeout = 30
         )
-        msg = response.choices[0].message.content
-        return list(map(int, msg.strip().split()))
+        msg = response.choices[0].message.parsed
+        return [msg.score0, msg.score1, msg.score2, msg.score3, msg.score4]
     except Exception as e:
         print(f"API error: {e}")
         return [None] * len(image_paths)
+
 
 # ====== Main Processing Function ======
 def process_folders(filestem: str, base_dir: str):
@@ -126,9 +139,6 @@ def process_folders(filestem: str, base_dir: str):
 # ====== Main Program ======
 if __name__ == "__main__":
     for filestem in BIAS_CLASSES:
-        #try:
         if input(f"Do you want to find new images for {filestem} (y/n)? ").lower()[0] == 'y':
             dirpath = os.path.join("./images", filestem)
             process_folders(filestem, dirpath)
-        #except Exception as e:
-        #    print(f"error: {e}")

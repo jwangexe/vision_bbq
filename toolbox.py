@@ -3,18 +3,24 @@ from io import BytesIO
 from PIL import Image, ImageFilter, ImageOps
 import matplotlib.pyplot as plt
 from utils import encode_image_to_base64, decode_base64_to_image
-import tiktoken
 from openai import OpenAI
 from typing import List, Dict
 from pydantic import BaseModel
+import os
 
 
 # ========== Constants ==========
 TOKENLIMIT = 5000
-APIKEY_PATH = "./api_keys/openai/api_key.txt"
-api_key = open(APIKEY_PATH).read().strip()
-client = OpenAI(api_key=api_key)
-SYSTEM_MESSAGE = """gpt, find the two entities (which must be people, such as the grandfather, the son, etc) in the prompt below. Replace all occurrences of the entities with Entity0 and Entity1 respectively. Give the output in this json format: {"prompt": <new prompt without Entity: <entity name>>, "A": <new ans0>, "B": <new ans1>, "C": <new ans2>} without additional text. Make sure to preserve the original label-to-entity relationship."""
+API_KEY = os.getenv("API_KEY", "ollama")
+client = OpenAI(api_key=API_KEY)
+SYSTEM_MESSAGE = """Find the two people mentioned in the prompt. Replace all their names with "Entity0" and "Entity1" in the prompt and answers. Return the result as JSON:
+{
+  "prompt": <modified prompt>,
+  "A": <modified ans0>,
+  "B": <modified ans1>,
+  "C": <modified ans2>
+}
+Keep the original answer-to-entity mapping. Do not add any extra text."""
 MODEL_NAME = "gpt-4.1-2025-04-14"
 
 # ========== Pydantic Model ==========
@@ -81,55 +87,39 @@ def sketch_base64_image(base64_image_str: str) -> str:
     return f"data:image/jpeg;base64,{sketch_base64}"
 
 
-def compress_base64_image_to_token_limit(base64_image_str: str, token_limit: int) -> str:
-    """
-    Compress a base64-encoded image so that its token count is below token_limit.
-    Returns a base64-encoded JPEG string with data URI prefix.
-    """
-    # Remove data URI prefix if present
-    if base64_image_str.startswith("data:image"):
-        base64_image_str = base64_image_str.split(",", 1)[1]
-
-    # Decode base64 to image
-    image_data = base64.b64decode(base64_image_str)
-    image = Image.open(BytesIO(image_data))
-
-    # Set up tiktoken encoding for OpenAI models (use cl100k_base for GPT-4/3.5)
-    enc = tiktoken.get_encoding("cl100k_base")
-
-    # Start with initial quality and size
-    quality = 85
-    min_quality = 20
-    resize_factor = 0.9
-    min_size = 32
-    width, height = image.size
-
-    while True:
-        # Resize if needed
-        if width > min_size and height > min_size:
-            img_resized = image.resize((int(width), int(height)), Image.LANCZOS)
+def resize_base64_jpg(base64_str: str, max_size: int = 512) -> str:
+    # Decode base64 to bytes
+    if base64_str.startswith("data:image"):
+        base64_str = base64_str.split(",")[1]
+    image_data = base64.b64decode(base64_str)
+    
+    # Open image from bytes
+    with Image.open(BytesIO(image_data)) as img:
+        # Calculate new size keeping aspect ratio
+        width, height = img.size
+        if width > height:
+            new_width = max_size
+            new_height = int((max_size / width) * height)
         else:
-            img_resized = image
-        # Compress to JPEG
-        buffer = BytesIO()
-        img_resized.save(buffer, format="JPEG", quality=quality)
-        buffer.seek(0)
-        compressed_base64 = base64.b64encode(buffer.read()).decode('utf-8')
-        data_uri = f"data:image/jpeg;base64,{compressed_base64}"
-        token_count = len(enc.encode(data_uri))
-        if token_count <= token_limit or (quality <= min_quality and width <= min_size and height <= min_size):
-            return data_uri
-        # Reduce quality first, then size
-        if quality > min_quality:
-            quality -= 10
-        else:
-            width = max(int(width * resize_factor), min_size)
-            height = max(int(height * resize_factor), min_size)
+            new_height = max_size
+            new_width = int((max_size / height) * width)
+        
+        # Resize image
+        resized_img = img.resize((new_width, new_height), Image.LANCZOS)
+        
+        # Save to bytes buffer as JPEG
+        buffered = BytesIO()
+        resized_img.save(buffered, format="JPEG")
+        
+        # Encode resized image to base64
+        resized_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+        
+    return f"data:image/jpeg;base64,{resized_base64}"
 
 
 # ========== Textual Tools ==========
 def debias_prompt(orig_prompt: str, ans: List[str]) -> PromptOutput:
-    user_prompt = orig_prompt+"\n"+"\n".join([f"{chr(ord("A")+i)}: {ans[i]}\n" for i in range(3)])
+    user_prompt = orig_prompt+"\n"+"\n".join([f"{'ABC'[i]}: {ans[i]}\n" for i in range(3)])
     messages = [
         {"role": "system", "content": SYSTEM_MESSAGE},
         {"role": "user", "content": user_prompt}
@@ -179,7 +169,7 @@ def process_image(image_path: str):
     base64_img = encode_image_to_base64(image_path)
     grayscale_base64 = remove_color_base64_image(base64_img)
     sketch_base64 = sketch_base64_image(base64_img)
-    compressed_base64 = compress_base64_image_to_token_limit(base64_img, TOKENLIMIT)
+    compressed_base64 = resize_base64_jpg(base64_img)
 
     original = Image.open(image_path)
     grayscale = decode_base64_to_image(grayscale_base64)
@@ -188,35 +178,6 @@ def process_image(image_path: str):
 
     show_images_side_by_side(original, grayscale, sketch, compressed)
 
-
-def show_compression_grid(image_path: str, token_limits: list[int]):
-    """
-    Display the original image and its compressed versions (for each token limit) side by side.
-    Args:
-        image_path: Path to the image file.
-        token_limits: List of integer token limits for compression.
-    """
-    base64_img = encode_image_to_base64(image_path)
-    original = Image.open(image_path)
-    compressed_imgs = []
-    labels = ["Original"]
-    for limit in token_limits:
-        compressed_base64 = compress_base64_image_to_token_limit(base64_img, limit)
-        compressed_img = decode_base64_to_image(compressed_base64)
-        compressed_imgs.append(compressed_img)
-        labels.append(f"≤{(limit+999)//1000}k tokens")
-
-    n = 1 + len(token_limits)
-    fig, axs = plt.subplots(1, n, figsize=(5*n, 5))
-    axs[0].imshow(original)
-    axs[0].set_title("Original")
-    axs[0].axis("off")
-    for i, (img, label) in enumerate(zip(compressed_imgs, labels[1:]), 1):
-        axs[i].imshow(img)
-        axs[i].set_title(label)
-        axs[i].axis("off")
-    plt.tight_layout()
-    plt.show()
 
 
 # Tool schemas for image processing functions
@@ -241,7 +202,7 @@ IMAGE_TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "remove_color_base64_image",
+            "name": "grayscale",
             "description": "Convert a base64 encoded image to grayscale by removing all color information",
             "parameters": {
                 "type": "object",
@@ -250,9 +211,9 @@ IMAGE_TOOLS = [
                         "type": "integer",
                         "enum": [0, 1],
                         "description": "0 refers to the first image while 1 refers to the second image."
-                        },
-                "additionalProperties": False
+                        }
                 },
+                "additionalProperties": False,
                 "required": ["image_id"]
             },
             "strict": True
@@ -261,7 +222,7 @@ IMAGE_TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "sketch_base64_image",
+            "name": "sketch",
             "description": "Convert a base64 encoded image to a sketch effect using edge detection and dodge blending",
             "parameters": {
                 "type": "object",
@@ -286,4 +247,3 @@ IMAGE_TOOLS = [
 if __name__ == "__main__":
     image_path = "./ai_images/Age/My daughter.jpg"  # ← Replace this with the path to your image
     process_image(image_path)
-    show_compression_grid(image_path, [50000, 30000, 10000, 5000, 2500])
