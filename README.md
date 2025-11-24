@@ -61,7 +61,7 @@ Models are evaluated based on:
 - The LLMs initially all performed well (at or close to 100%) in ambiguous contexts, resulting in a low accuracy increase.
 - For the GPT models in disambiguated contexts, SAIC improved the scores of less-benchmarked categories (i.e. Disability status, sexual orientation) more than it did those of more-benchmarked categories.
 
-**Detailed results and analysis can be found in our [paper](./paper.pdf) (if applicable).**
+**Detailed results and analysis can be found in our [paper](./vBBQv3.pdf).**
 
 ## 🚀 Usage
 
