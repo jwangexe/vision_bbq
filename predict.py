@@ -125,8 +125,8 @@ def get_model_answer_no_self_feedback(context: str, question: str, answer_texts:
     else:
         response = run_openai_api_call({
             "model": model_name,
-            "functions": tools,
-            "function_call": {"name": "auto"},  # Let the model decide which tool to call
+            "tools": tools,
+            "tool_choice": "auto",  # Let the model decide which tool to call
             "messages": messages,
             "response_format": ModelAnswer,
             "timeout": 60  # 60 second timeout
