@@ -1,0 +1,114 @@
+[
+ {
+  "ch": "openai",
+  "kind": "parse",
+  "resp": {
+   "id": "chatcmpl-EaHjxj1YtdNqLAvXpHF3SJzTv7xwP",
+   "choices": [
+    {
+     "finish_reason": "stop",
+     "index": 0,
+     "logprobs": null,
+     "message": {
+      "content": "{\"score0\":2,\"score1\":7,\"score2\":7,\"score3\":9,\"score4\":10}",
+      "refusal": null,
+      "role": "assistant",
+      "annotations": [],
+      "audio": null,
+      "function_call": null,
+      "tool_calls": null,
+      "parsed": {
+       "score0": 2,
+       "score1": 7,
+       "score2": 7,
+       "score3": 9,
+       "score4": 10
+      }
+     }
+    }
+   ],
+   "created": 1792316709,
+   "model": "gpt-4.1-2025-04-14",
+   "object": "chat.completion",
+   "metadata": null,
+   "moderation": null,
+   "service_tier": "default",
+   "system_fingerprint": "fp_53c1396753",
+   "usage": {
+    "completion_tokens": 26,
+    "prompt_tokens": 1597,
+    "total_tokens": 1623,
+    "completion_tokens_details": {
+     "accepted_prediction_tokens": 0,
+     "audio_tokens": 0,
+     "reasoning_tokens": 0,
+     "rejected_prediction_tokens": 0,
+     "text_tokens": null
+    },
+    "prompt_tokens_details": {
+     "audio_tokens": 0,
+     "cache_write_tokens": null,
+     "cached_tokens": 0,
+     "image_tokens": null,
+     "text_tokens": null
+    }
+   }
+  }
+ },
+ {
+  "ch": "openai",
+  "kind": "parse",
+  "resp": {
+   "id": "chatcmpl-EaHk0038mUtIotdUyNcC96qJFscD2",
+   "choices": [
+    {
+     "finish_reason": "stop",
+     "index": 0,
+     "logprobs": null,
+     "message": {
+      "content": "{\"score0\":3,\"score1\":3,\"score2\":6,\"score3\":5,\"score4\":8}",
+      "refusal": null,
+      "role": "assistant",
+      "annotations": [],
+      "audio": null,
+      "function_call": null,
+      "tool_calls": null,
+      "parsed": {
+       "score0": 3,
+       "score1": 3,
+       "score2": 6,
+       "score3": 5,
+       "score4": 8
+      }
+     }
+    }
+   ],
+   "created": 1792316712,
+   "model": "gpt-4.1-2025-04-14",
+   "object": "chat.completion",
+   "metadata": null,
+   "moderation": null,
+   "service_tier": "default",
+   "system_fingerprint": "fp_53c1396753",
+   "usage": {
+    "completion_tokens": 26,
+    "prompt_tokens": 1600,
+    "total_tokens": 1626,
+    "completion_tokens_details": {
+     "accepted_prediction_tokens": 0,
+     "audio_tokens": 0,
+     "reasoning_tokens": 0,
+     "rejected_prediction_tokens": 0,
+     "text_tokens": null
+    },
+    "prompt_tokens_details": {
+     "audio_tokens": 0,
+     "cache_write_tokens": null,
+     "cached_tokens": 0,
+     "image_tokens": null,
+     "text_tokens": null
+    }
+   }
+  }
+ }
+]
