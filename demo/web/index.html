@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vision-BBQ Walkthrough</title>
+  <meta name="description" content="Step-by-step demo of the Vision-BBQ (vBBQ) multimodal bias benchmark and the SAIC bias-mitigation framework, running the original Python code in the browser.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow">Vision-BBQ (vBBQ) · Yijun Wang</p>
+      <h1>Does a picture make a model more biased, and can it be undone?</h1>
+      <p class="lede">vBBQ adds images to the BBQ social-bias benchmark, then tests <b>SAIC</b>
+        (Sensitive Attribute Invariance Control): tools that let the model anonymize entity names
+        and turn photos grayscale or into sketches before it answers. This page walks through the whole
+        pipeline on one real question, from building the dataset to scoring the model.</p>
+      <nav class="links">
+        <a href="https://github.com/jwangexe/vision_bbq/blob/main/vBBQv3.pdf" target="_blank" rel="noopener">Paper (PDF)</a>
+        <a href="https://github.com/jwangexe/vision_bbq" target="_blank" rel="noopener">Code</a>
+        <a href="https://huggingface.co/datasets/jwangexe/vision-bbq" target="_blank" rel="noopener">Dataset</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="how">
+      <div>
+        <h2>How this demo runs</h2>
+        <ul>
+          <li>Every step runs the project's <b>original Python files</b> in your browser (Pyodide), unmodified apart from a two-line API fix in <code>predict.py</code>.</li>
+          <li>The calls they make to GPT-4.1, GPT-4o and the image search API were <b>recorded once</b><span id="rec-date"></span> and are replayed here, so the demo costs nothing to run and gives the same result every time.</li>
+          <li>Google's image search API is closed to new projects, so image search uses <b>Openverse</b> instead (labelled in step 3).</li>
+          <li>Demo scale: <b>10 searched images per person instead of 100</b>, and one question instead of 31,372.</li>
+        </ul>
+      </div>
+      <div class="runbox">
+        <div id="status" class="status loading"><span class="dot"></span><span id="status-text">Starting…</span></div>
+        <button id="run-all" class="btn primary" disabled>Run all steps</button>
+      </div>
+    </section>
+
+    <ol id="steps" class="steps"></ol>
+  </main>
+
+  <footer class="wrap foot">
+    <p id="foot-meta"></p>
+    <p>Builds on the <a href="https://github.com/nyu-mll/BBQ" target="_blank" rel="noopener">BBQ dataset</a> (CC-BY-4.0).
+      Contexts and questions come from a bias benchmark and may describe harmful stereotypes.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -24,3 +24,6 @@ black/
 vbbq.zip
 subset.zip
 requirements 2.txt
+# HF Space demo build artifacts
+demo/_work/
+demo/dist/
