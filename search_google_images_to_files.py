@@ -84,16 +84,15 @@ def get_n_images_per_entity(n: int, df: pd.DataFrame, savepath: str) -> pd.DataF
 
 # ========== Main Execution ==========
 if __name__ == "__main__":
-    # if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
-    #     for filestem in BIAS_CLASSES:
-    filestem = "Sexual_orientation"
-    filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
-    dst_filepath = os.path.join(DICT_PATH, filestem+"_images.csv")
-    # if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
-    #     continue
-    # if "x" in filestem:
-    #     continue
-    print(f"Reading from {filestem}...")
+    if input("Are you sure you want to find new images(y/n)? ").lower()[0] == 'y':
+        for filestem in BIAS_CLASSES:
+            filepath = os.path.join(DICT_PATH, filestem+"_entity.csv")
+            dst_filepath = os.path.join(DICT_PATH, filestem+"_images.csv")
+            if input(f"Do you want to find images for file {filestem} (y/n)? ").lower()[0] != "y":
+                continue
+            if "x" in filestem:
+                continue
+            print(f"Reading from {filestem}...")
 
-    df = pd.read_csv(filepath)
-    get_n_images_per_entity(IMAGES_PER_ENTITY, df, os.path.join(IMAGES_SAVE_PATH, filestem))
+            df = pd.read_csv(filepath)
+            get_n_images_per_entity(IMAGES_PER_ENTITY, df, os.path.join(IMAGES_SAVE_PATH, filestem))

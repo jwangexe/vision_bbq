@@ -179,6 +179,24 @@ def process_image(image_path: str):
     show_images_side_by_side(original, grayscale, sketch, compressed)
 
 
+def save_transform_image(image_path: str, output_dir: str):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    base64_img = encode_image_to_base64(image_path)
+    grayscale_base64 = remove_color_base64_image(base64_img)
+    sketch_base64 = sketch_base64_image(base64_img)
+
+    original = Image.open(image_path)
+    grayscale = decode_base64_to_image(grayscale_base64)
+    sketch = decode_base64_to_image(sketch_base64)
+
+    # Save images
+    original.save(os.path.join(output_dir, "original.jpg"))
+    grayscale.save(os.path.join(output_dir, "grayscale.jpg"))
+    sketch.save(os.path.join(output_dir, "sketch.jpg"))
+
+
 
 # Tool schemas for image processing functions
 TEXT_TOOLS = [
@@ -245,5 +263,8 @@ IMAGE_TOOLS = [
 # === Example usage ===
 
 if __name__ == "__main__":
-    image_path = "./ai_images/Age/My daughter.jpg"  # ← Replace this with the path to your image
-    process_image(image_path)
+    # image_path = "./ai_images/Age/My daughter.jpg"  # ← Replace this with the path to your image
+    # process_image(image_path)
+
+    save_transform_image("M-White.jpg", "./white")
+    save_transform_image("Picture 1.png-1.jpg", "./black")

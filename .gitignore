@@ -18,3 +18,9 @@ delete.py
 *.csv
 *.pkl
 *.sh
+*.jpg
+white/
+black/
+vbbq.zip
+subset.zip
+requirements 2.txt
