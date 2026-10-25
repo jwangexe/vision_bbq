@@ -2,9 +2,11 @@
 
 ![Python Version](https://img.shields.io/badge/python-3.12.7%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-[![Dataset](https://img.shields.io/badge/%F0%9F%93%84-Dataset%20HuggingFace-orange)]([https://huggingface.co/datasets/your_username/vision_bbq](https://huggingface.co/datasets/jwangexe/vision-bbq))
+![Dataset](https://img.shields.io/badge/%F0%9F%93%84-Dataset%20HuggingFace-orange)
 
 > **Vision-BBQ (vBBQ)** is a multimodal extension of the [BBQ (Bias Benchmark for QA)](https://github.com/nyu-mll/BBQ) dataset. It augments BBQ text context with images, in order to benchmark social biases in large language models (LLMs) and vision-language models (VLMs) in a more realistic and challenging visual context.
+
+**▶ [Demo](https://huggingface.co/spaces/jwangexe/vision-bbq-demo)
 
 ## 📖 Overview
 
@@ -39,7 +41,7 @@ The dataset can be downloaded from Hugging Face Datasets.
 from datasets import load_dataset
 dataset = load_dataset("jwangexe/vision-bbq")
 ```
-A subset of the dataset, containg only the [1,092] paired images, can be found on [Google Drive](https://drive.google.com/file/d/1SrD6K8PWvL6EXOu6mXJELEuR9xX0TbKK/view?usp=sharing). This subset is sufficient for conducting experiments on the same scale of vBBQ questions.
+A subset of the dataset, containg only the [1,092] paired images, can be found on [Hugging Face](https://huggingface.co/datasets/jwangexe/vision-bbq). This subset is sufficient for conducting experiments on the same scale of vBBQ questions.
 
 ## 🧪 Evaluation & Results
 
@@ -130,7 +132,7 @@ We welcome contributions! Please feel free to:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-The original BBQ dataset is licensed under CC-BY-4.0. Please ensure any use of the vBBQ dataset complies with the licenses of the original data and the curated images.
+The original BBQ dataset is licensed under CC-BY-4.0.
 
 ## 🙏 Acknowledgments
 
